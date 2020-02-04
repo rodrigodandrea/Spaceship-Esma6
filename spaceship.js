@@ -12,12 +12,14 @@ var ctx = null;
 var lastPress = null;
 var pressing = [];
 var pause;
-var player = new Rectangle(90, 280, 10, 10, 3);
+var player = new Rectangle(90, 280, 10, 10, 0, 3);
 var shots = [];
 var pause = true;
 var gameover = true;
 var score = 0;
 var enemies = [];
+var powerups = [];
+var multishot = 1;
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -47,9 +49,11 @@ function reset() {
   player.y = 280;
   shots.length = 0;
   enemies.length = 0;
-  enemies.push(new Rectangle(10, 0, 10, 10, 2));
+  enemies.push(new Rectangle(10, 0, 10, 10, 0, 2));
   gameover = false;
   player.health = 3;
+  multishot = 1;
+  powerups.length = 0
   player.timer = 0;
 }
 
@@ -89,7 +93,16 @@ function act() {
 
     // New Shot
     if (lastPress == KEY_SPACE) {
-      shots.push(new Rectangle(player.x + 3, player.y, 5, 5));
+      if (multishot == 3) {
+        shots.push(new Rectangle(player.x - 3, player.y + 2, 5, 5));
+        shots.push(new Rectangle(player.x + 3, player.y, 5, 5));
+        shots.push(new Rectangle(player.x + 9, player.y + 2, 5, 5));
+      } else if (multishot == 2) {
+        shots.push(new Rectangle(player.x, player.y, 5, 5));
+        shots.push(new Rectangle(player.x + 5, player.y, 5, 5));
+      } else {
+        shots.push(new Rectangle(player.x + 3, player.y, 5, 5));
+      }  
       lastPress = null;
     }
 
@@ -105,10 +118,21 @@ function act() {
           score++;
           enemies[i].health--;
           if (enemies[i].health < 1) {
+            // Add PowerUp
+            var r = random(20);
+            if (r < 5) {
+              if (r == 0) {
+                // New MultiShot
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 10, 10, 1));
+              } else {
+                // New ExtraPoints
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 10, 10, 0));
+              }
+            }
             enemies[i].x = random(canvas.width / 10) * 10;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            enemies.push(new Rectangle(random(canvas.width / 10) * 10, 0, 10, 10, 2));
+            enemies.push(new Rectangle(random(canvas.width / 10) * 10, 0, 10, 10, 0, 2));
           } else {
             enemies[i].timer = 1;
           }
@@ -128,17 +152,28 @@ function act() {
         player.health--;
         player.timer = 20;
       }
-    
+
       // Shot Intersects Enemy
       for (var j = 0, ll = shots.length; j < ll; j++) {
         if (shots[j].intersects(enemies[i])) {
           score++;
           enemies[i].health--;
           if (enemies[i].health < 1) {
+            // Add PowerUp
+            var r = random(20);
+            if (r < 5) {
+              if (r == 0) {
+                // New MultiShot
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 10, 10, 1));
+              } else {
+                // New ExtraPoints
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 10, 10, 0));
+              }
+            }
             enemies[i].x = random(canvas.width / 10) * 10;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            enemies.push(new Rectangle(random(canvas.width / 10) * 10, 0, 10, 10, 2));
+            enemies.push(new Rectangle(random(canvas.width / 10) * 10, 0, 10, 10, 0, 2));
           } else {
             enemies[i].timer = 1;
           }
@@ -166,6 +201,33 @@ function act() {
     if (player.health < 1) {
       gameover = true;
       pause = true;
+    }
+  }
+
+  // Move PowerUps
+  for (var i = 0, l = powerups.length; i < l; i++) {
+    powerups[i].y += 10;
+    // Powerup Outside Screen
+    if (powerups[i].y > canvas.height) {
+      powerups.splice(i--, 1);
+      l--;
+      continue;
+    }
+    // Player intersects
+    if (player.intersects(powerups[i])) {
+      if (powerups[i].type == 1) {
+        // MultiShot
+        if (multishot < 3) {
+          multishot++;
+        } else {
+          score += 5;
+        }
+      } else {
+        // ExtraPoints
+        score += 5;
+      }
+      powerups.splice(i--, 1);
+      l--;
     }
   }
 
@@ -202,6 +264,16 @@ function paint(ctx) {
     shots[i].fill(ctx);
   }
 
+  // Improves
+  for (var i = 0, l = powerups.length; i < l; i++) {
+    if (powerups[i].type == 1) {
+      ctx.fillStyle = '#f90';
+    } else {
+      ctx.fillStyle = '#cc6';
+      powerups[i].fill(ctx);
+    }
+  }
+
   // Inmunity
   if (player.timer % 2 == 0) {
     player.fill(ctx);
@@ -209,11 +281,11 @@ function paint(ctx) {
 
   // Show health    
   ctx.fillStyle = '#fff'
-  ctx.fillText('Health: ' + player.health, 100, 20);
+  ctx.fillText('Health: ' + player.health, 150, 20);
 
   // Show score
   ctx.fillStyle = '#fff';
-  ctx.fillText('Score: ' + score, 0, 20);
+  ctx.fillText('Score: ' + score, 50, 20);
   //ctx.fillText('Last Press: '+lastPress,0,20);
   //ctx.fillText('Shots: '+shots.length,0,30);
 
@@ -237,11 +309,12 @@ document.addEventListener('keyup', function (evt) {
   pressing[evt.keyCode] = false;
 }, false);
 
-function Rectangle(x, y, width, height, health) {
+function Rectangle(x, y, width, height, type, health) {
   this.x = (x == null) ? 0 : x;
   this.y = (y == null) ? 0 : y;
   this.width = (width == null) ? 0 : width;
   this.height = (height == null) ? this.width : height;
+  this.type = (type == null) ? 1 : type;
   this.health = (health == null) ? 1 : health;
   this.timer = 0;
 }
