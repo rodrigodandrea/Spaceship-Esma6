@@ -20,16 +20,17 @@ var shots = [];
 var enemies = [];
 var powerups = [];
 var messages = [];
-var ships = new Image();
-ships.src = 'assets/ships.png';
-var fstrip = new Image();
-fstrip.src = 'assets/fstrip.png';
-var spaceship = new Image();
-spaceship.src = 'assets/spaceship.png';
 var stars = [];
 var bgTimer = 0;
+var eTimer = 20;
 var background = new Image();
+var ships = new Image();
+var fstrip = new Image();
+var spaceship = new Image();
 background.src = 'assets/nebula.png';
+ships.src = 'assets/ships.png';
+fstrip.src = 'assets/fstrip.png';
+spaceship.src = 'assets/spaceship.png';
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -147,10 +148,63 @@ function act() {
       lastPress = null;
     }
 
+    // Generate Enemy
+    eTimer--;
+    if (eTimer < 0) {
+      enemies.push(new Rectangle(0, 60, 40, 40, 1));
+      eTimer = 20 + random(40);
+    }
+
     // Move Enemies
     for (var i = 0, l = enemies.length; i < l; i++) {
       if (enemies[i].timer > 0) {
         enemies[i].timer--;
+      }
+
+      // Shooter
+      if (enemies[i].type == 1) {
+        enemies[i].x += 10;
+        // Shooter Outside Screen
+        if (enemies[i].x > canvas.width) {
+          enemies.splice(i--, 1);
+          l--;
+          continue;
+        }
+
+        // Shooter Shots
+        enemies[i].timer--;
+        if (enemies[i].timer < 0) {
+          enemies.push(new Rectangle(enemies[i].x + 3, enemies[i].y + 5, 10, 10, 2));
+          enemies[i].timer = 10 + random(30);
+        }
+
+        // Shot Intersects Shooter
+        for (var j = 0, ll = shots.length; j < ll; j++) {
+          if (shots[j].intersects(enemies[i])) {
+            score++;
+            shots.splice(j--, 1);
+            ll--;
+            enemies.splice(i--, 1);
+            l--;
+          }
+        }
+      }
+
+      // EnemyShot
+      else if (enemies[i].type == 2) {
+        enemies[i].y += 10;
+        // EnemyShot Outside Screen
+        if (enemies[i].y > canvas.height) {
+          enemies.splice(i--, 1);
+          l--;
+          continue;
+        }
+
+        // Player Intersects EnemyShot
+        if (player.intersects(enemies[i]) && player.timer < 1) {
+          player.health--;
+          player.timer = 20;
+        }
       }
 
       // Shot Intersects Enemy
@@ -173,8 +227,8 @@ function act() {
             enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            if (enemies.legth < 100) {
-            enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
+            if (enemies.legth < 50) {
+              enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
             }
           } else {
             enemies[i].timer = 1;
@@ -184,16 +238,18 @@ function act() {
         }
       }
 
-      enemies[i].y += 10;
-      if (enemies[i].y > canvas.height) {
-        enemies[i].x = random(canvas.width / 40) * 40;
-        enemies[i].y = 0;
-      }
+      if (enemies[i].type == 0) {
+        enemies[i].y += 10;
+        if (enemies[i].y > canvas.height) {
+          enemies[i].x = random(canvas.width / 40) * 40;
+          enemies[i].y = 0;
+        }
 
-      // Player Intersects Enemy
-      if (player.intersects(enemies[i]) && player.timer < 1) {
-        player.health--;
-        player.timer = 20;
+        // Player Intersects Enemy
+        if (player.intersects(enemies[i]) && player.timer < 1) {
+          player.health--;
+          player.timer = 20;
+        }
       }
 
       // Shot Intersects Enemy
@@ -216,7 +272,7 @@ function act() {
             enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            if (enemies.length < 100) {
+            if (enemies.length < 50) {
               enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
             }
           } else {
@@ -326,12 +382,20 @@ function paint(ctx) {
 
   // Enemies
   for (var i = 0, l = enemies.length; i < l; i++) {
-    if (enemies[i].health == 2) {
-      ctx.fillStyle = '#0a3f21';
-      enemies[i].drawImageArea(ctx, ships, 35, 100, 25, 25);
-    } else {
-      ctx.fillStyle = '#01f4f5';
-      enemies[i].drawImageArea(ctx, ships, 35, 100, 25, 25);
+    if (enemies[i].type == 0) {
+      if (enemies[i].health == 2) {
+        ctx.fillStyle = '#0a3f21';
+        enemies[i].drawImageArea(ctx, ships, 35, 100, 25, 25);
+      } else {
+        ctx.fillStyle = '#01f4f5';
+        enemies[i].drawImageArea(ctx, ships, 35, 128, 25, 25);
+      }
+    }
+    else if (enemies[i].type == 1) {
+      enemies[i].drawImageArea(ctx, ships, 35, 200, 25, 25);
+    }
+    else if (enemies[i].type == 2) {
+      enemies[i].drawImageArea(ctx, fstrip, 168, 21, 12, 12);
     }
   }
 
