@@ -27,6 +27,9 @@ fstrip.src = 'assets/fstrip.png';
 var spaceship = new Image();
 spaceship.src = 'assets/spaceship.png';
 var stars = [];
+var bgTimer = 0;
+var background = new Image();
+background.src = 'assets/nebula.png';
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -170,7 +173,9 @@ function act() {
             enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
+            if (enemies.legth < 100) {
             enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
+            }
           } else {
             enemies[i].timer = 1;
           }
@@ -211,7 +216,9 @@ function act() {
             enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
+            if (enemies.length < 100) {
+              enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
+            }
           } else {
             enemies[i].timer = 1;
           }
@@ -271,6 +278,12 @@ function act() {
       }
     }
 
+    // Move Background
+    bgTimer++;
+    if (bgTimer > 0) {
+      bgTimer -= background.height;
+    }
+
     // Move Messages
     for (var i = 0, l = messages.length; i < l; i++) {
       messages[i].y += 2;
@@ -300,6 +313,12 @@ function paint(ctx) {
     var c = 255 - Math.abs(100 - stars[i].timer);
     ctx.fillStyle = 'rgb(' + c + ', ' + c + ', ' + c + ')';
     ctx.fillRect(stars[i].x, stars[i].y, 1, 1);
+  }
+
+  // Draw Background
+  if (background.width) {
+    ctx.drawImage(background, 0, bgTimer);
+    ctx.drawImage(background, 0, background.height + bgTimer);
   }
 
   // Draw player
