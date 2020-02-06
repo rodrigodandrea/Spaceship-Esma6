@@ -15,7 +15,7 @@ var pause = true;
 var gameover = true;
 var score = 0;
 var multishot = 1;
-var player = new Rectangle(80, 270, 20, 20, 0, 3);
+var player = new Rectangle(200, 530, 40, 40, 0, 3);
 var shots = [];
 var enemies = [];
 var powerups = [];
@@ -24,12 +24,19 @@ var ships = new Image();
 ships.src = 'assets/ships.png';
 var fstrip = new Image();
 fstrip.src = 'assets/fstrip.png';
+var spaceship = new Image();
+spaceship.src = 'assets/spaceship.png';
+var stars = [];
 
 function init() {
   canvas = document.getElementById('canvas');
   ctx = canvas.getContext('2d');
-  canvas.width = 300;
-  canvas.height = 300;
+  canvas.width = 400;
+  canvas.height = 580;
+
+  for (i = 0; i < 200; i++) {
+    stars.push(new Star(random(canvas.width), random(canvas.height), random(200)));
+  }
 
   run();
   repaint();
@@ -55,15 +62,21 @@ function Message(string, x, y) {
   this.y = (y == null) ? 0 : y;
 }
 
+function Star(x, y, timer) {
+  this.x = (x == null) ? 0 : x;
+  this.y = (y == null) ? 0 : y;
+  this.timer = (timer == null) ? 0 : timer;
+}
+
 function reset() {
   score = 0;
-  player.x = 90;
-  player.y = 270;
+  player.x = 200;
+  player.y = 530;
   shots.length = 0;
   enemies.length = 0;
   powerups.length = 0;
   messages.length = 0;
-  enemies.push(new Rectangle(10, 0, 20, 20, 0, 2));
+  enemies.push(new Rectangle(40, 0, 40, 40, 0, 2));
   gameover = false;
   player.health = 3;
   player.timer = 0;
@@ -84,7 +97,7 @@ function act() {
     }*/
 
     if (pressing[KEY_RIGHT]) {
-      player.x += 20;
+      player.x += 40;
     }
 
     /*if(pressing[KEY_DOWN]) {
@@ -92,7 +105,7 @@ function act() {
     }*/
 
     if (pressing[KEY_LEFT]) {
-      player.x -= 20;
+      player.x -= 40;
     }
 
     // Out Screen
@@ -104,17 +117,29 @@ function act() {
       player.x = 0;
     }
 
+    // Move Stars
+    for (i = 0, l = stars.length; i < l; i++) {
+      stars[i].y++;
+      if (stars[i].y > canvas.height) {
+        stars[i].y = 0;
+      }
+      stars[i].timer += 5;
+      if (stars[i].timer > 200) {
+        stars[i].timer -= 200;
+      }
+    }
+
     // New Shot
     if (lastPress == KEY_SPACE) {
       if (multishot == 3) {
-        shots.push(new Rectangle(player.x - 5, player.y + 2, 5, 5));
-        shots.push(new Rectangle(player.x + 8, player.y, 5, 5));
-        shots.push(new Rectangle(player.x + 21, player.y + 2, 5, 5));
+        shots.push(new Rectangle(player.x - 12, player.y + 2, 8, 8));
+        shots.push(new Rectangle(player.x + 15, player.y, 8, 8));
+        shots.push(new Rectangle(player.x + 42, player.y + 2, 8, 8));
       } else if (multishot == 2) {
-        shots.push(new Rectangle(player.x + 4, player.y, 5, 5));
-        shots.push(new Rectangle(player.x + 12, player.y, 5, 5));
+        shots.push(new Rectangle(player.x + 6, player.y, 8, 8));
+        shots.push(new Rectangle(player.x + 26, player.y, 8, 8));
       } else {
-        shots.push(new Rectangle(player.x + 8, player.y, 5, 5));
+        shots.push(new Rectangle(player.x + 15, player.y, 8, 8));
       }
       lastPress = null;
     }
@@ -136,16 +161,16 @@ function act() {
             if (r < 5) {
               if (r == 0) {
                 // New MultiShot
-                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 20, 20, 1));
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 40, 40, 1));
               } else {
                 // New ExtraPoints
-                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 20, 20, 0));
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 40, 40, 0));
               }
             }
-            enemies[i].x = random(canvas.width / 20) * 20;
+            enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            enemies.push(new Rectangle(random(canvas.width / 20) * 20, 0, 20, 20, 0, 2));
+            enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
           } else {
             enemies[i].timer = 1;
           }
@@ -154,9 +179,9 @@ function act() {
         }
       }
 
-      enemies[i].y += 5;
+      enemies[i].y += 10;
       if (enemies[i].y > canvas.height) {
-        enemies[i].x = random(canvas.width / 20) * 20;
+        enemies[i].x = random(canvas.width / 40) * 40;
         enemies[i].y = 0;
       }
 
@@ -177,16 +202,16 @@ function act() {
             if (r < 5) {
               if (r == 0) {
                 // New MultiShot
-                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 20, 20, 1));
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 40, 40, 1));
               } else {
                 // New ExtraPoints
-                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 20, 20, 0));
+                powerups.push(new Rectangle(enemies[i].x, enemies[i].y, 40, 40, 0));
               }
             }
-            enemies[i].x = random(canvas.width / 20) * 20;
+            enemies[i].x = random(canvas.width / 40) * 40;
             enemies[i].y = 0;
             enemies[i].health = 2;
-            enemies.push(new Rectangle(random(canvas.width / 20) * 20, 0, 20, 20, 0, 2));
+            enemies.push(new Rectangle(random(canvas.width / 40) * 40, 0, 40, 40, 0, 2));
           } else {
             enemies[i].timer = 1;
           }
@@ -218,7 +243,7 @@ function act() {
 
     // Move PowerUps
     for (var i = 0, l = powerups.length; i < l; i++) {
-      powerups[i].y += 5;
+      powerups[i].y += 10;
       // Powerup Outside Screen
       if (powerups[i].y > canvas.height) {
         powerups.splice(i--, 1);
@@ -249,7 +274,7 @@ function act() {
     // Move Messages
     for (var i = 0, l = messages.length; i < l; i++) {
       messages[i].y += 2;
-      if (messages[i].y < 260) {
+      if (messages[i].y < 200) {
         messages.splice(i--, 1);
         l--;
       }
@@ -269,10 +294,16 @@ function paint(ctx) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Draw stars
+  ctx.fillStyle = '#fff';
+  for (i = 0, l = stars.length; i < l; i++) {
+    var c = 255 - Math.abs(100 - stars[i].timer);
+    ctx.fillStyle = 'rgb(' + c + ', ' + c + ', ' + c + ')';
+    ctx.fillRect(stars[i].x, stars[i].y, 1, 1);
+  }
+
   // Draw player
-  //ctx.fillStyle = '#0f0';
-  player.drawImageArea(ctx, ships, 36, 171, 25, 25);
-  //player.fill(ctx);
+  player.drawImageArea(ctx, spaceship, 0, 0, 150, 150);
 
   // Enemies
   for (var i = 0, l = enemies.length; i < l; i++) {
@@ -283,7 +314,6 @@ function paint(ctx) {
       ctx.fillStyle = '#01f4f5';
       enemies[i].drawImageArea(ctx, ships, 35, 100, 25, 25);
     }
-    //enemies[i].fill(ctx);
   }
 
   // Draw shot
@@ -302,36 +332,28 @@ function paint(ctx) {
       ctx.fillStyle = '#cc6';
       powerups[i].drawImageArea(ctx, ships, 35, 68, 25, 25);
     }
-    //powerups[i].fill(ctx);
   }
 
   // Messages
   ctx.fillStyle = '#fff';
   for (var i = 0, l = messages.length; i < l; i++) {
-    ctx.fillText(messages[i].string, messages[i].x, messages[i].y - 20);
+    ctx.fillText(messages[i].string, messages[i].x, messages[i].y - 50);
   }
-
-  // Inmunity
-  //if (player.timer % 2 == 0) {
-  //  player.fill(ctx);
-  //}
 
   // Show health    
   ctx.fillStyle = '#fff'
-  ctx.fillText('Health: ' + player.health, 150, 20);
+  ctx.fillText('Health: ' + player.health, 350, 20);
 
   // Show score
   ctx.fillStyle = '#fff';
   ctx.fillText('Score: ' + score, 50, 20);
-  //ctx.fillText('Last Press: '+lastPress,0,20);
-  //ctx.fillText('Shots: '+shots.length,0,30);
 
   if (pause) {
     ctx.textAlign = 'center';
     if (gameover) {
-      ctx.fillText('GAME OVER', 100, 150);
+      ctx.fillText('GAME OVER', 200, 300);
     } else {
-      ctx.fillText('PAUSE', 100, 150);
+      ctx.fillText('PAUSE', 200, 300);
       ctx.textAlign = 'left';
     }
   }
@@ -372,14 +394,6 @@ Rectangle.prototype.fill = function (ctx) {
 Rectangle.prototype.drawImageArea = function (ctx, img, sx, sy, sw, sh) {
   if (img.width) {
     ctx.drawImage(img, sx, sy, sw, sh, this.x, this.y, this.width, this.height);
-  } else {
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
-  }
-}
-
-Rectangle.prototype.drawImage = function (ctx, img) {
-  if (img.width) {
-    ctx.drawImage(img, this.x, this.y);
   } else {
     ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
