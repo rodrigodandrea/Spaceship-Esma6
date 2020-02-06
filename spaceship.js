@@ -24,11 +24,11 @@ var stars = [];
 var bgTimer = 0;
 var eTimer = 20;
 var background = new Image();
-var ships = new Image();
+var smallships = new Image();
 var fstrip = new Image();
 var spaceship = new Image();
 background.src = 'assets/nebula.png';
-ships.src = 'assets/ships.png';
+smallships.src = 'assets/smallships.png';
 fstrip.src = 'assets/fstrip.png';
 spaceship.src = 'assets/spaceship.png';
 
@@ -385,14 +385,14 @@ function paint(ctx) {
     if (enemies[i].type == 0) {
       if (enemies[i].health == 2) {
         ctx.fillStyle = '#0a3f21';
-        enemies[i].drawImageArea(ctx, ships, 35, 100, 25, 25);
+        enemies[i].drawImageArea(ctx, smallships, 35, 100, 25, 25);
       } else {
         ctx.fillStyle = '#01f4f5';
-        enemies[i].drawImageArea(ctx, ships, 35, 128, 25, 25);
+        enemies[i].drawImageArea(ctx, smallships, 35, 128, 25, 25);
       }
     }
     else if (enemies[i].type == 1) {
-      enemies[i].drawImageArea(ctx, ships, 35, 200, 25, 25);
+      enemies[i].drawImageArea(ctx, smallships, 35, 200, 25, 25);
     }
     else if (enemies[i].type == 2) {
       enemies[i].drawImageArea(ctx, fstrip, 168, 21, 12, 12);
@@ -410,10 +410,10 @@ function paint(ctx) {
   for (var i = 0, l = powerups.length; i < l; i++) {
     if (powerups[i].type == 1) {
       ctx.fillStyle = '#f90';
-      powerups[i].drawImageArea(ctx, ships, 35, 68, 25, 25);
+      powerups[i].drawImageArea(ctx, smallships, 35, 68, 25, 25);
     } else {
       ctx.fillStyle = '#cc6';
-      powerups[i].drawImageArea(ctx, ships, 35, 68, 25, 25);
+      powerups[i].drawImageArea(ctx, smallships, 35, 68, 25, 25);
     }
   }
 
