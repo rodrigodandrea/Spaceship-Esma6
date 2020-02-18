@@ -1,32 +1,32 @@
 window.addEventListener('load', init, false);
 
-var KEY_ENTER = 13;
-var KEY_SPACE = 32;
-var KEY_LEFT = 37;
-var KEY_UP = 38;
-var KEY_RIGHT = 39;
-var KEY_DOWN = 40;
+const KEY_ENTER = 13;
+const KEY_SPACE = 32;
+const KEY_LEFT = 37;
+const KEY_UP = 38;
+const KEY_RIGHT = 39;
+const KEY_DOWN = 40;
 
-var canvas = null;
-var ctx = null;
-var lastPress = null;
-var pressing = [];
-var pause = true;
-var gameover = true;
-var score = 0;
-var multishot = 1;
-var player = new Rectangle(200, 530, 40, 40, 0, 3);
-var shots = [];
-var enemies = [];
-var powerups = [];
-var messages = [];
-var stars = [];
-var bgTimer = 0;
-var eTimer = 20;
-var background = new Image();
-var smallships = new Image();
-var fstrip = new Image();
-var spaceship = new Image();
+let canvas = null;
+let ctx = null;
+let lastPress = null;
+let pressing = [];
+let pause = true;
+let gameover = true;
+let score = 0;
+let multishot = 1;
+let player = new Rectangle(200, 530, 40, 40, 0, 3);
+let shots = [];
+let enemies = [];
+let powerups = [];
+let messages = [];
+let stars = [];
+let bgTimer = 0;
+let eTimer = 20;
+let background = new Image();
+let smallships = new Image();
+let fstrip = new Image();
+let spaceship = new Image();
 background.src = 'assets/nebula.png';
 smallships.src = 'assets/smallships.png';
 fstrip.src = 'assets/fstrip.png';
@@ -156,7 +156,7 @@ function act() {
     }
 
     // Move Enemies
-    for (var i = 0, l = enemies.length; i < l; i++) {
+    for (let i = 0, l = enemies.length; i < l; i++) {
       if (enemies[i].timer > 0) {
         enemies[i].timer--;
       }
@@ -179,7 +179,7 @@ function act() {
         }
 
         // Shot Intersects Shooter
-        for (var j = 0, ll = shots.length; j < ll; j++) {
+        for (let j = 0, ll = shots.length; j < ll; j++) {
           if (shots[j].intersects(enemies[i])) {
             score++;
             shots.splice(j--, 1);
@@ -208,13 +208,13 @@ function act() {
       }
 
       // Shot Intersects Enemy
-      for (var j = 0, ll = shots.length; j < ll; j++) {
+      for (let j = 0, ll = shots.length; j < ll; j++) {
         if (shots[j].intersects(enemies[i])) {
           score++;
           enemies[i].health--;
           if (enemies[i].health < 1) {
             // Add PowerUp
-            var r = random(20);
+            let r = random(20);
             if (r < 5) {
               if (r == 0) {
                 // New MultiShot
@@ -253,13 +253,13 @@ function act() {
       }
 
       // Shot Intersects Enemy
-      for (var j = 0, ll = shots.length; j < ll; j++) {
+      for (let j = 0, ll = shots.length; j < ll; j++) {
         if (shots[j].intersects(enemies[i])) {
           score++;
           enemies[i].health--;
           if (enemies[i].health < 1) {
             // Add PowerUp
-            var r = random(20);
+            let r = random(20);
             if (r < 5) {
               if (r == 0) {
                 // New MultiShot
@@ -285,7 +285,7 @@ function act() {
     }
 
     // Move Shots
-    for (var i = 0, l = shots.length; i < l; i++) {
+    for (let i = 0, l = shots.length; i < l; i++) {
       shots[i].y -= 10;
       if (shots[i].y < 0) {
         shots.splice(i--, 1);
@@ -305,7 +305,7 @@ function act() {
     }
 
     // Move PowerUps
-    for (var i = 0, l = powerups.length; i < l; i++) {
+    for (let i = 0, l = powerups.length; i < l; i++) {
       powerups[i].y += 10;
       // Powerup Outside Screen
       if (powerups[i].y > canvas.height) {
@@ -341,7 +341,7 @@ function act() {
     }
 
     // Move Messages
-    for (var i = 0, l = messages.length; i < l; i++) {
+    for (let i = 0, l = messages.length; i < l; i++) {
       messages[i].y += 2;
       if (messages[i].y < 200) {
         messages.splice(i--, 1);
@@ -366,7 +366,7 @@ function paint(ctx) {
   // Draw stars
   ctx.fillStyle = '#fff';
   for (i = 0, l = stars.length; i < l; i++) {
-    var c = 255 - Math.abs(100 - stars[i].timer);
+    let c = 255 - Math.abs(100 - stars[i].timer);
     ctx.fillStyle = 'rgb(' + c + ', ' + c + ', ' + c + ')';
     ctx.fillRect(stars[i].x, stars[i].y, 1, 1);
   }
@@ -381,7 +381,7 @@ function paint(ctx) {
   player.drawImageArea(ctx, spaceship, 0, 0, 150, 150);
 
   // Enemies
-  for (var i = 0, l = enemies.length; i < l; i++) {
+  for (let i = 0, l = enemies.length; i < l; i++) {
     if (enemies[i].type == 0) {
       if (enemies[i].health == 2) {
         ctx.fillStyle = '#0a3f21';
@@ -401,13 +401,13 @@ function paint(ctx) {
 
   // Draw shot
   ctx.fillStyle = '#f00';
-  for (var i = 0, l = shots.length; i < l; i++) {
+  for (let i = 0, l = shots.length; i < l; i++) {
     //shots[i].fill(ctx);
     shots[i].drawImageArea(ctx, fstrip, 21, 21, 8, 8);
   }
 
   // PowerUps
-  for (var i = 0, l = powerups.length; i < l; i++) {
+  for (let i = 0, l = powerups.length; i < l; i++) {
     if (powerups[i].type == 1) {
       ctx.fillStyle = '#f90';
       powerups[i].drawImageArea(ctx, smallships, 35, 68, 25, 25);
@@ -419,7 +419,7 @@ function paint(ctx) {
 
   // Messages
   ctx.fillStyle = '#fff';
-  for (var i = 0, l = messages.length; i < l; i++) {
+  for (let i = 0, l = messages.length; i < l; i++) {
     ctx.fillText(messages[i].string, messages[i].x, messages[i].y - 50);
   }
 

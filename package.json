@@ -1,0 +1,23 @@
+{
+  "name": "spaceship-es6",
+  "version": "1.0.0",
+  "description": "",
+  "main": "spaceship.js",
+  "dependencies": {
+    "babel-loader": "^8.0.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodrigodandrea/Spaceship-Esma6.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rodrigodandrea/Spaceship/issues"
+  },
+  "homepage": "https://github.com/rodrigodandrea/Spaceship#readme"
+}
